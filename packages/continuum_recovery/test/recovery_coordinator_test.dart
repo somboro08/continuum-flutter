@@ -3,10 +3,10 @@ import 'package:continuum_recovery/continuum_recovery.dart';
 import 'package:test/test.dart';
 
 class _Participant implements RecoveryParticipant {
-  _Participant(this.recoveryId, {this.snapshot = 'draft-v1', this.restoreError});
+  _Participant(this.recoveryId, {this.restoreError});
+  String? snapshot = 'draft-v1';
   @override
   final String recoveryId;
-  String? snapshot;
   Object? restoreError;
   String? restored;
   @override
