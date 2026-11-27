@@ -46,6 +46,8 @@ class DraftSession {
   DraftAutosavePort? _controller;
   int _revision = 0;
   bool _dirty = false;
+  bool _submissionFinalizing = false;
+  bool _submissionFinalized = false;
 
   Map<String, Object?> get values =>
       Map<String, Object?>.unmodifiable(_values);
@@ -78,6 +80,7 @@ class DraftSession {
 
   /// Updates one field and requests a debounced autosave.
   Future<CheckpointResult> updateField(String fieldId, Object? value) {
+    _ensureEditable();
     final controller = _requireController();
     if (!fields.containsKey(fieldId)) {
       throw ArgumentError.value(fieldId, 'fieldId', 'Field is not registered.');
@@ -91,6 +94,7 @@ class DraftSession {
 
   /// Applies a group of field changes and schedules one coalesced checkpoint.
   Future<CheckpointResult> updateFields(Map<String, Object?> changes) {
+    _ensureEditable();
     final controller = _requireController();
     if (controller.isDisposed) throw StateError('Draft autosave controller has been disposed.');
     for (final fieldId in changes.keys) {
@@ -113,15 +117,27 @@ class DraftSession {
   }) async {
     final shouldClearDraft = clearDraft ?? clearOnSuccessfulSubmission;
     if (shouldClearDraft) {
-      final controller = _controller;
-      if (controller != null && !controller.isDisposed) {
-        await controller.checkpointNow();
+      if (_submissionFinalizing || _submissionFinalized) {
+        throw StateError('Draft submission has already been finalized.');
       }
-      await repository.afterSuccessfulSubmission(
-        formId: formId,
-        clearDraft: true,
-      );
-      _dirty = false;
+      _submissionFinalizing = true;
+      try {
+        final controller = _controller;
+        if (controller != null && !controller.isDisposed) {
+          await controller.checkpointNow();
+        }
+        await repository.afterSuccessfulSubmission(
+          formId: formId,
+          clearDraft: true,
+        );
+        _dirty = false;
+        _submissionFinalized = true;
+      } catch (_) {
+        _submissionFinalizing = false;
+        rethrow;
+      } finally {
+        _submissionFinalizing = false;
+      }
     }
     if (clearValues) {
       _values.clear();
