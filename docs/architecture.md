@@ -14,6 +14,7 @@ continuum_core  ←  continuum_lifecycle
 continuum_persistence  ←  continuum_recovery
 continuum_persistence + continuum_recovery  ←  continuum_drafts
 continuum_recovery  ←  continuum_navigation_recovery
+continuum_navigation_recovery + Flutter SDK  ←  continuum_navigation_flutter
 
 continuum_persistence  ←  continuum_storage_file
 
@@ -41,4 +42,6 @@ Passwords, OTPs, secrets and payment credentials are not persisted by default. S
 ## Extension points
 Draft/form recovery is provided by the optional `continuum_drafts` package. It uses the storage port and shared checkpoint scheduler, keeps schema and migration ownership with each form, and filters fields through an explicit privacy policy. Search history, operation journal, background scheduling, offline synchronization, keyboard/focus and feedback helpers should likewise be independently installable packages or adapters.
 
-Navigation recovery is provided by the optional `continuum_navigation_recovery` package. It implements `RecoveryParticipant`, stores router-neutral route IDs and explicitly allow-listed parameters, validates the complete stack before restore, and delegates router operations to an application-owned `NavigationStatePort`. It does not depend on or select a routing library. They must not add mandatory dependencies to core.
+Navigation recovery is provided by the optional `continuum_navigation_recovery` package. It implements `RecoveryParticipant`, stores router-neutral route IDs and explicitly allow-listed parameters, validates the complete stack before restore, and delegates router operations to an application-owned `NavigationStatePort`.
+
+The optional `continuum_navigation_flutter` package implements that port using Flutter's declarative `Navigator.pages` API. Its `NavigationPageRegistry` maps route IDs to application-owned page factories. It validates the complete target page list before publishing a replacement, while the host application retains ownership of the Navigator widget. The recovery package remains independent of Flutter and other routing libraries. GoRouter and AutoRoute adapters can be implemented separately against the same port.
