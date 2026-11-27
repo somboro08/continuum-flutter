@@ -6,11 +6,14 @@
 - [x] Storage port and persistence policies
 - [x] Feature-owned recovery snapshots
 - [ ] Unit tests and CI validation
-- [ ] In-memory store for tests and examples
+- [x] In-memory store for tests and examples
+- [x] Namespaced storage wrapper
+- [x] File-system storage adapter with encoded keys and serialized operations
 
 ## Next
 - [ ] Lifecycle checkpoint policy (debounce, throttling, explicit checkpoints)
-- [ ] Durable storage adapters, selected independently
+- [x] Dependency-free file storage adapter
+- [ ] Encrypted storage adapter (opt-in, separate package)
 - [ ] Draft/form recovery participant
 - [ ] Navigation restoration adapter
 - [ ] Operation journal and idempotent resume safeguards
