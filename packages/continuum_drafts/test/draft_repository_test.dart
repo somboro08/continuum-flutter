@@ -63,7 +63,7 @@ void main() {
         schema: DraftSchema(version: 1),
         fields: fields,
         values: const {'name': 'Ada', 'email': 'ada@example.com'},
-        policy: const DraftPrivacyPolicy(
+        policy: DraftPrivacyPolicy(
           allowedSensitivities: {
             DraftFieldSensitivity.ordinary,
             DraftFieldSensitivity.personal,
