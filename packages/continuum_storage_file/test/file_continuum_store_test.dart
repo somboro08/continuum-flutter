@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:continuum_persistence/continuum_persistence.dart';
 import 'package:continuum_storage_file/continuum_storage_file.dart';
 import 'package:test/test.dart';
 
@@ -51,5 +52,18 @@ void main() {
 
   test('missing values return null', () async {
     expect(await store.read('not-found'), isNull);
+  });
+
+  test('wraps file-system failures with operation context', () async {
+    final blocker = File('${directory.path}${Platform.pathSeparator}not-a-directory');
+    await blocker.writeAsString('occupied');
+    final brokenStore = FileContinuumStore(directory: Directory(blocker.path));
+    await expectLater(
+      brokenStore.write('draft', 'value'),
+      throwsA(isA<ContinuumStorageException>()
+          .having((error) => error.operation, 'operation', ContinuumStorageOperation.write)
+          .having((error) => error.key, 'key', 'draft')
+          .having((error) => error.stackTrace, 'stackTrace', isNotNull)),
+    );
   });
 }
