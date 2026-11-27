@@ -1,6 +1,6 @@
 import 'package:continuum_navigation_flutter/continuum_navigation_flutter.dart';
 import 'package:continuum_navigation_recovery/continuum_navigation_recovery.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -9,11 +9,11 @@ void main() {
 
     setUp(() {
       registry = NavigationPageRegistry({
-        'home': (entry) => MaterialPage<void>(
+        'home': (entry) => TestPage(
               key: ValueKey<String>('home-${entry.parameters['id'] ?? 'root'}'),
               child: const SizedBox(),
             ),
-        'details': (entry) => MaterialPage<void>(
+        'details': (entry) => TestPage(
               key: ValueKey<String>('details-${entry.parameters['id']}'),
               child: const SizedBox(),
             ),
@@ -33,8 +33,10 @@ void main() {
 
       expect(captured.map((entry) => entry.routeId), ['home', 'details']);
       expect(adapter.pages, hasLength(2));
-      expect(() => captured.add(NavigationEntry(routeId: 'home')),
-          throwsUnsupportedError);
+      expect(
+        () => captured.add(NavigationEntry(routeId: 'home')),
+        throwsUnsupportedError,
+      );
       adapter.dispose();
     });
 
@@ -86,7 +88,7 @@ void main() {
 
     test('factory errors do not partially replace the stack', () async {
       final failingRegistry = NavigationPageRegistry({
-        'home': (_) => const MaterialPage<void>(
+        'home': (_) => const TestPage(
               key: ValueKey<String>('home'),
               child: SizedBox(),
             ),
@@ -112,11 +114,11 @@ void main() {
 
     test('rejects duplicate page keys before publishing a stack', () async {
       final duplicateRegistry = NavigationPageRegistry({
-        'home': (_) => const MaterialPage<void>(
+        'home': (_) => const TestPage(
               key: ValueKey<String>('same'),
               child: SizedBox(),
             ),
-        'details': (_) => const MaterialPage<void>(
+        'details': (_) => const TestPage(
               key: ValueKey<String>('same'),
               child: SizedBox(),
             ),
@@ -128,6 +130,23 @@ void main() {
           NavigationEntry(routeId: 'home'),
           NavigationEntry(routeId: 'details'),
         ]),
+        throwsA(isA<StateError>()),
+      );
+
+      expect(adapter.entries, isEmpty);
+      expect(adapter.pages, isEmpty);
+      adapter.dispose();
+    });
+
+    test('rejects pages without stable keys before publishing a stack',
+        () async {
+      final noKeyRegistry = NavigationPageRegistry({
+        'home': (_) => const TestPage(child: SizedBox()),
+      });
+      final adapter = NavigatorPagesAdapter(pageRegistry: noKeyRegistry);
+
+      await expectLater(
+        adapter.replaceStack([NavigationEntry(routeId: 'home')]),
         throwsA(isA<StateError>()),
       );
 
@@ -166,4 +185,18 @@ void main() {
       );
     });
   });
+}
+
+class TestPage extends Page<void> {
+  const TestPage({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Route<void> createRoute(BuildContext context) {
+    return PageRouteBuilder<void>(
+      settings: this,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
+    );
+  }
 }
