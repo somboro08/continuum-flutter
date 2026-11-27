@@ -135,6 +135,37 @@ void main() {
     expect((await request).isSuccessful, isTrue);
   });
 
+  test('flush on dispose waits for a running checkpoint and its queued successor', () async {
+    final firstStarted = Completer<void>();
+    final releaseFirst = Completer<void>();
+    var calls = 0;
+    final scheduler = CheckpointScheduler(
+      debounce: Duration.zero,
+      minimumInterval: const Duration(seconds: 30),
+      checkpoint: () async {
+        calls++;
+        if (calls == 1) {
+          firstStarted.complete();
+          await releaseFirst.future;
+        }
+        return success();
+      },
+    );
+
+    final first = scheduler.checkpointNow();
+    await firstStarted.future;
+    final second = scheduler.requestCheckpoint();
+    var disposed = false;
+    final disposal = scheduler.dispose(flushPending: true).then((_) => disposed = true);
+    releaseFirst.complete();
+
+    await disposal;
+    expect(disposed, isTrue);
+    expect(calls, 2);
+    expect((await first).isSuccessful, isTrue);
+    expect((await second).isSuccessful, isTrue);
+  });
+
   test('validates timing configuration', () {
     expect(
       () => CheckpointScheduler(checkpoint: () async => success(), debounce: const Duration(milliseconds: -1)),
