@@ -26,8 +26,9 @@ This repository is a Dart/Flutter monorepo. Packages are intentionally separated
 - `packages/continuum_recovery` — recovery orchestration and checkpoints.
 - `packages/continuum_drafts` — optional form-draft persistence, privacy filtering, autosave and schema migrations.
 - `packages/continuum_navigation_recovery` — router-agnostic navigation stack recovery with route allow-lists and migrations.
+- `packages/continuum_navigation_flutter` — optional Flutter Navigator.pages adapter for navigation recovery.
 
-Additional modules (navigation, operations, background tasks, offline sync, keyboard and feedback) will be added behind stable contracts.
+Additional modules (search history, operations, background tasks, offline sync, keyboard and feedback) will be added behind stable contracts.
 
 ## Compatibility goals
 
