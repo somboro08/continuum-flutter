@@ -33,10 +33,15 @@ class DraftAutosaveController implements DraftAutosavePort {
     _sessions[session.formId] = session;
   }
 
-  bool unregister(String formId) {
+  Future<bool> unregister(String formId, {bool flush = true}) async {
     _ensureActive();
-    final session = _sessions.remove(formId);
+    final session = _sessions[formId];
     if (session == null) return false;
+    if (flush && session.isDirty) {
+      final result = await checkpointNow();
+      if (result.failed.containsKey(formId)) return false;
+    }
+    _sessions.remove(formId);
     session.detachController(this);
     return true;
   }
@@ -59,6 +64,9 @@ class DraftAutosaveController implements DraftAutosavePort {
   }
 
   Future<void> _dispose(bool flushPending) async {
+    if (flushPending && _sessions.values.any((session) => session.isDirty)) {
+      await _scheduler.checkpointNow();
+    }
     await _scheduler.dispose(flushPending: flushPending);
     for (final session in _sessions.values) {
       session.detachController(this);
