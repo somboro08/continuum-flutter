@@ -9,3 +9,5 @@ dependencies:
     path: ../continuum_core
   continuum_persistence:
     path: ../continuum_persistence
+dev_dependencies:
+  test: ^1.25.0

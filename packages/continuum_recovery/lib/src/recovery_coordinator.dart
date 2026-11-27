@@ -26,8 +26,13 @@ class RecoveryCoordinator {
 
   Future<void> checkpoint() async {
     for (final participant in _participants.values) {
+      final key = _key(participant.recoveryId);
       final snapshot = await participant.createSnapshot();
-      if (snapshot != null) await _store.write(_key(participant.recoveryId), snapshot);
+      if (snapshot == null) {
+        await _store.delete(key);
+      } else {
+        await _store.write(key, snapshot);
+      }
     }
   }
 
@@ -51,6 +56,11 @@ class RecoveryCoordinator {
     return RecoveryResult(restored: restored, missing: missing, failed: failed);
   }
 
-  Future<void> clear(String recoveryId) => _store.delete(_key(recoveryId));
+  Future<void> clear(String recoveryId) async {
+    final participant = _participants[recoveryId];
+    if (participant != null) await participant.clearRecoveredState();
+    await _store.delete(_key(recoveryId));
+  }
+
   String _key(String id) => '$namespace.$id';
 }

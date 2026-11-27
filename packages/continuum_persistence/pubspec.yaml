@@ -7,3 +7,5 @@ environment:
 dependencies:
   continuum_core:
     path: ../continuum_core
+dev_dependencies:
+  test: ^1.25.0
