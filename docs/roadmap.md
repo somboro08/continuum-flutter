@@ -5,14 +5,14 @@
 - [x] Flutter lifecycle adapter
 - [x] Storage port and persistence policies
 - [x] Feature-owned recovery snapshots
-- [ ] Unit tests and CI validation
+- [x] Unit tests and CI validation
 - [x] In-memory store for tests and examples
 - [x] Namespaced storage wrapper
 - [x] File-system storage adapter with encoded keys and serialized operations
+- [x] Debounced checkpoint scheduler with throttling and explicit flush
 
 ## Next
-- [ ] Lifecycle checkpoint policy (debounce, throttling, explicit checkpoints)
-- [x] Dependency-free file storage adapter
+- [ ] Lifecycle checkpoint policy and lifecycle adapter integration
 - [ ] Encrypted storage adapter (opt-in, separate package)
 - [ ] Draft/form recovery participant
 - [ ] Navigation restoration adapter
