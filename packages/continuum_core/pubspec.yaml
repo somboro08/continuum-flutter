@@ -1,0 +1,6 @@
+name: continuum_core
+description: Core contracts and module orchestration for Continuum.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ">=3.3.0 <4.0.0"

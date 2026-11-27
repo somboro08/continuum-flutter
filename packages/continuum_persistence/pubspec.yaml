@@ -1,0 +1,9 @@
+name: continuum_persistence
+description: Storage contracts for Continuum.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+dependencies:
+  continuum_core:
+    path: ../continuum_core
