@@ -16,7 +16,7 @@
 - [x] Lifecycle checkpoint policy and lifecycle adapter integration
 - [ ] Encrypted storage adapter (opt-in, separate package)
 - [x] Draft/form recovery package with privacy filtering, autosave and schema migrations
-- [ ] Navigation restoration adapter
+- [x] Router-agnostic navigation recovery participant and adapter contract
 - [ ] Operation journal and idempotent resume safeguards
 
 ## Later
