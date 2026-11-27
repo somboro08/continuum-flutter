@@ -8,15 +8,18 @@ class DraftAutosaveController implements DraftAutosavePort {
   DraftAutosaveController({
     Duration debounce = const Duration(milliseconds: 400),
     Duration minimumInterval = const Duration(seconds: 2),
-  }) : _scheduler = CheckpointScheduler(
-          checkpoint: _checkpoint,
-          debounce: debounce,
-          minimumInterval: minimumInterval,
-        );
+  }) {
+    _scheduler = CheckpointScheduler(
+      checkpoint: _checkpoint,
+      debounce: debounce,
+      minimumInterval: minimumInterval,
+    );
+  }
 
-  final CheckpointScheduler _scheduler;
+  late final CheckpointScheduler _scheduler;
   final Map<String, DraftSession> _sessions = <String, DraftSession>{};
   bool _disposed = false;
+  Future<void>? _disposeFuture;
 
   bool get isDisposed => _disposed;
   int get registeredSessionCount => _sessions.length;
@@ -48,9 +51,14 @@ class DraftAutosaveController implements DraftAutosavePort {
     return _scheduler.checkpointNow();
   }
 
-  Future<void> dispose({bool flushPending = true}) async {
-    if (_disposed) return;
+  Future<void> dispose({bool flushPending = true}) {
+    final existing = _disposeFuture;
+    if (existing != null) return existing;
     _disposed = true;
+    return _disposeFuture = _dispose(flushPending);
+  }
+
+  Future<void> _dispose(bool flushPending) async {
     await _scheduler.dispose(flushPending: flushPending);
     for (final session in _sessions.values) {
       session.detachController(this);
