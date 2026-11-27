@@ -126,6 +126,10 @@ void main() {
       expect(session.values, isEmpty);
       expect(session.isDirty, isFalse);
       expect(
+        () => session.updateField('name', 'after-submit'),
+        throwsStateError,
+      );
+      expect(
         await repository.load(
           formId: 'submitted',
           schema: DraftSchema(version: 1),
