@@ -4,7 +4,7 @@ class DraftSnapshot {
     required this.schemaVersion,
     required this.createdAt,
     required this.updatedAt,
-    required this.fields,
+    required Map<String, Object?> fields,
     this.expiresAt,
   }) : fields = Map<String, Object?>.unmodifiable(fields) {
     if (formId.trim().isEmpty) {
