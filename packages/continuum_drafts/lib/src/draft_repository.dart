@@ -102,8 +102,9 @@ class DraftRepository {
     required DraftSchema schema,
   }) async {
     _validateFormId(formId);
-    var snapshot = await _readSnapshot(formId);
-    if (snapshot == null) return null;
+    final storedSnapshot = await _readSnapshot(formId);
+    if (storedSnapshot == null) return null;
+    var snapshot = storedSnapshot;
 
     if (snapshot.isExpiredAt(_clock())) {
       await delete(formId);
