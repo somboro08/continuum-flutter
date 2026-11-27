@@ -7,11 +7,11 @@ class _MemoryStore implements ContinuumStore {
   @override
   Future<String?> read(String key) async => values[key];
   @override
-  Future<void> write(String key, String value) async => values[key] = value;
+  Future<void> write(String key, String value) async { values[key] = value; }
   @override
-  Future<void> delete(String key) async => values.remove(key);
+  Future<void> delete(String key) async { values.remove(key); }
   @override
-  Future<void> deleteAll({String? namespace}) async => values.clear();
+  Future<void> deleteAll({String? namespace}) async { values.clear(); }
 }
 
 class _Participant implements RecoveryParticipant {
@@ -23,9 +23,9 @@ class _Participant implements RecoveryParticipant {
   @override
   Future<String?> createSnapshot() async => snapshot;
   @override
-  Future<void> restoreSnapshot(String value) async => restored = value;
+  Future<void> restoreSnapshot(String value) async { restored = value; }
   @override
-  Future<void> clearRecoveredState() async => cleared = true;
+  Future<void> clearRecoveredState() async { cleared = true; }
 }
 
 void main() {
@@ -34,11 +34,10 @@ void main() {
     final participant = _Participant();
     final coordinator = RecoveryCoordinator(store: store);
     coordinator.register(participant);
-
     await coordinator.checkpoint();
     participant.restored = null;
-    final result = await coordinator.recover();
 
+    final result = await coordinator.recover();
     expect(participant.restored, 'draft-v1');
     expect(result.restored, ['editor']);
     expect(result.failed, isEmpty);
@@ -50,11 +49,10 @@ void main() {
     final coordinator = RecoveryCoordinator(store: store);
     coordinator.register(participant);
     await coordinator.checkpoint();
-
     participant.snapshot = null;
     await coordinator.checkpoint();
-    final result = await coordinator.recover();
 
+    final result = await coordinator.recover();
     expect(result.missing, ['editor']);
     expect(result.restored, isEmpty);
   });

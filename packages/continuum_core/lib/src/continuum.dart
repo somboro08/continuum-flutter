@@ -36,8 +36,10 @@ class Continuum {
     try {
       for (final module in ordered) {
         logger.debug('Initializing "${module.id}".');
-        await module.initialize(context);
+        // Track before invoking initialize so rollback also disposes a module
+        // whose initialization failed after allocating a resource.
         _initialized.add(module);
+        await module.initialize(context);
       }
       _state = ContinuumRuntimeState.ready;
       logger.info('Continuum ready: ${_initialized.length} module(s).');
