@@ -75,7 +75,10 @@ class DraftRepository {
       );
     }
 
-    final existing = await _readSnapshot(formId);
+    final previous = await _readSnapshot(formId);
+    final existing = previous != null && !previous.isExpiredAt(now)
+        ? previous
+        : null;
     final snapshot = DraftSnapshot(
       formId: formId,
       schemaVersion: schema.version,
