@@ -73,15 +73,19 @@ class LifecycleCheckpointBinding {
 
   void _handleTransition(LifecycleTransition transition) {
     if (!checkpointOn.contains(transition.current)) return;
-    final operation = immediateOn.contains(transition.current)
-        ? _scheduler.checkpointNow()
-        : _scheduler.requestCheckpoint();
-    operation.then<void>(
-      (result) => _invoke(() => onCheckpointResult?.call(result, transition)),
-      onError: (Object error, StackTrace stackTrace) {
-        _invoke(() => onCheckpointError?.call(error, stackTrace, transition));
-      },
-    );
+    try {
+      final operation = immediateOn.contains(transition.current)
+          ? _scheduler.checkpointNow()
+          : _scheduler.requestCheckpoint();
+      operation.then<void>(
+        (result) => _invoke(() => onCheckpointResult?.call(result, transition)),
+        onError: (Object error, StackTrace stackTrace) {
+          _invoke(() => onCheckpointError?.call(error, stackTrace, transition));
+        },
+      );
+    } catch (error, stackTrace) {
+      _invoke(() => onCheckpointError?.call(error, stackTrace, transition));
+    }
   }
 
   void _invoke(void Function() callback) {
