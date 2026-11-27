@@ -62,7 +62,7 @@ class CheckpointScheduler {
   /// An already-running checkpoint is always awaited.
   Future<void> dispose({bool flushPending = false}) async {
     if (_disposed) {
-      await _running;
+      await _waitUntilIdle();
       return;
     }
     _disposed = true;
