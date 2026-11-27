@@ -31,6 +31,7 @@ class CheckpointScheduler {
   Future<void>? _running;
   Duration? _lastStartedAt;
   bool _disposed = false;
+  bool _forcePending = false;
 
   bool get isDisposed => _disposed;
   bool get isRunning => _running != null;
@@ -51,6 +52,7 @@ class CheckpointScheduler {
     _ensureActive();
     final completer = Completer<CheckpointResult>();
     _waiters.add(completer);
+    _forcePending = true;
     _cancelTimers();
     _tryRun(ignoreThrottle: true);
     return completer.future;
@@ -93,7 +95,8 @@ class CheckpointScheduler {
 
   void _tryRun({bool ignoreThrottle = false}) {
     if (_waiters.isEmpty || _running != null) return;
-    if (!ignoreThrottle && _lastStartedAt != null) {
+    final bypassThrottle = ignoreThrottle || _forcePending;
+    if (!bypassThrottle && _lastStartedAt != null) {
       final elapsed = _clock.elapsed - _lastStartedAt!;
       final remaining = minimumInterval - elapsed;
       if (remaining > Duration.zero) {
@@ -110,26 +113,25 @@ class CheckpointScheduler {
     final batch = List<Completer<CheckpointResult>>.of(_waiters);
     _waiters.clear();
     _lastStartedAt = _clock.elapsed;
-    final operation = _runBatch(batch);
-    _running = operation.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    _forcePending = false;
+    _running = _runBatch(batch);
     _running!.whenComplete(() {
       _running = null;
       if (_waiters.isNotEmpty) _tryRun(ignoreThrottle: _disposed);
     });
   }
 
-  Future<CheckpointResult> _runBatch(List<Completer<CheckpointResult>> batch) async {
+  Future<void> _runBatch(List<Completer<CheckpointResult>> batch) async {
     try {
       final result = await _checkpoint();
       for (final waiter in batch) {
         if (!waiter.isCompleted) waiter.complete(result);
       }
-      return result;
     } catch (error, stackTrace) {
       for (final waiter in batch) {
         if (!waiter.isCompleted) waiter.completeError(error, stackTrace);
       }
-      return Future<CheckpointResult>.error(error, stackTrace);
+      // Each requesting caller receives the original failure and stack trace.
     }
   }
 
