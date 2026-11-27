@@ -179,6 +179,12 @@ class DraftSession {
     return result;
   }
 
+  void _ensureEditable() {
+    if (_submissionFinalizing || _submissionFinalized) {
+      throw StateError('Draft session cannot be edited after successful submission.');
+    }
+  }
+
   DraftAutosavePort _requireController() {
     final controller = _controller;
     if (controller == null) {
