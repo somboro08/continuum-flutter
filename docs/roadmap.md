@@ -10,9 +10,10 @@
 - [x] Namespaced storage wrapper
 - [x] File-system storage adapter with encoded keys and serialized operations
 - [x] Debounced checkpoint scheduler with throttling and explicit flush
+- [x] Optional lifecycle-to-checkpoint binding adapter
 
 ## Next
-- [ ] Lifecycle checkpoint policy and lifecycle adapter integration
+- [x] Lifecycle checkpoint policy and lifecycle adapter integration
 - [ ] Encrypted storage adapter (opt-in, separate package)
 - [ ] Draft/form recovery participant
 - [ ] Navigation restoration adapter
