@@ -4,7 +4,8 @@ import 'package:flutter/widgets.dart';
 
 /// Observes Flutter lifecycle changes; it never attempts to keep the process alive.
 class FlutterLifecycleModule extends ContinuumModule
-    implements LifecycleEventSource, WidgetsBindingObserver {
+    with WidgetsBindingObserver
+    implements LifecycleEventSource {
   FlutterLifecycleModule();
 
   static const moduleId = 'continuum.lifecycle';
