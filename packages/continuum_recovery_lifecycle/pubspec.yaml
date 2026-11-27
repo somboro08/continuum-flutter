@@ -1,0 +1,13 @@
+name: continuum_recovery_lifecycle
+description: Lifecycle-to-checkpoint bridge for Continuum recovery.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+dependencies:
+  continuum_core:
+    path: ../continuum_core
+  continuum_recovery:
+    path: ../continuum_recovery
+dev_dependencies:
+  test: ^1.25.0
