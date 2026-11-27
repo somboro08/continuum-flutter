@@ -59,17 +59,21 @@ class DraftSession {
     }
     final snapshot = await repository.load(formId: formId, schema: schema);
     _values.clear();
-    if (snapshot != null) {
-      for (final entry in snapshot.fields.entries) {
-        final definition = fields[entry.key];
-        if (definition != null && privacyPolicy.allows(definition)) {
-          _values[entry.key] = entry.value;
-        }
+    if (snapshot == null) {
+      _revision++;
+      _dirty = false;
+      return null;
+    }
+    for (final entry in snapshot.fields.entries) {
+      final definition = fields[entry.key];
+      if (definition != null && privacyPolicy.allows(definition)) {
+        _values[entry.key] = entry.value;
       }
     }
     _revision++;
     _dirty = false;
-    return snapshot;
+    // Do not return values that the current privacy policy would exclude.
+    return snapshot.copyWith(fields: _values);
   }
 
   /// Updates one field and requests a debounced autosave.
