@@ -179,7 +179,7 @@ class DraftSession {
     return result;
   }
 
-  DraftAutosaveController _requireController() {
+  DraftAutosavePort _requireController() {
     final controller = _controller;
     if (controller == null) {
       throw StateError('Register the draft session before updating fields.');
