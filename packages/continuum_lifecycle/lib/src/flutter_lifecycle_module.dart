@@ -9,7 +9,8 @@ class FlutterLifecycleModule extends ContinuumModule
   FlutterLifecycleModule();
 
   static const moduleId = 'continuum.lifecycle';
-  final _controller = StreamController<LifecycleTransition>.broadcast();
+  StreamController<LifecycleTransition> _controller =
+      StreamController<LifecycleTransition>.broadcast();
   AppLifecyclePhase _current = AppLifecyclePhase.unknown;
   ContinuumServiceRegistry? _services;
   bool _initialized = false;
@@ -26,11 +27,21 @@ class FlutterLifecycleModule extends ContinuumModule
     // Register first so duplicate service registration fails before observer
     // resources are allocated.
     context.services.register<LifecycleEventSource>(this);
-    _services = context.services;
-    WidgetsBinding.instance.addObserver(this);
-    _initialized = true;
-    final initial = WidgetsBinding.instance.lifecycleState;
-    if (initial != null) _emit(_map(initial));
+    try {
+      // A disposed module can be initialized again with a fresh event stream.
+      if (_controller.isClosed) {
+        _controller = StreamController<LifecycleTransition>.broadcast();
+      }
+      WidgetsBinding.instance.addObserver(this);
+      _services = context.services;
+      _initialized = true;
+      final initial = WidgetsBinding.instance.lifecycleState;
+      if (initial != null) _emit(_map(initial));
+    } catch (_) {
+      context.services.unregister<LifecycleEventSource>();
+      _services = null;
+      rethrow;
+    }
   }
 
   @override
