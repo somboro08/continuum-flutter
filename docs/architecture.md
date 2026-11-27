@@ -2,27 +2,27 @@
 
 ## Dependency rules
 1. `continuum_core` contains platform-neutral contracts and module composition only.
-2. Feature packages depend inward on core; core never imports feature packages.
-3. Flutter, storage engines, routers, state managers and OS schedulers are adapters.
-4. Applications opt into modules; no global singleton or implicit installation.
+2. Flutter, storage engines, routers, state managers and OS schedulers are adapters.
+3. Feature packages depend only on the contracts they actually use.
+4. Core never imports a feature package; applications opt into modules explicitly.
 5. Features own their data schema, validation, migration and privacy policy.
 
 ## Package graph
 ```text
-continuum_core
-   ↑              ↑
-lifecycle     persistence
-                  ↑
-               recovery
+continuum_core  ←  continuum_lifecycle
+
+continuum_persistence  ←  continuum_recovery
 ```
 
+These are intentionally separate dependency lines. The application composes them; no package needs to pull the entire framework into its dependency graph.
+
 ## Runtime
-Modules declare stable IDs and dependencies. Continuum validates the dependency graph, initializes modules in dependency order, and disposes initialized modules in reverse order. A failed initialization triggers best-effort rollback.
+Modules declare stable IDs and dependencies. Continuum validates the dependency graph, initializes modules in dependency order, and disposes initialized modules in reverse order. A failed initialization triggers best-effort rollback, including cleanup of the module whose initialization failed.
 
 ## Recovery
 Each feature implements `RecoveryParticipant` and serializes its own snapshot. `RecoveryCoordinator` stores opaque strings through `ContinuumStore`; it does not know about forms, navigation or app state.
 
-Checkpoints are best-effort. Save at meaningful state changes and lifecycle transitions; never depend on a final callback before process death.
+Checkpoints are best-effort. Save at meaningful state changes and lifecycle transitions; never depend on a final callback before process death. A null snapshot deletes an older checkpoint so stale data cannot be restored accidentally.
 
 ## Privacy and platform rules
 Passwords, OTPs, secrets and payment credentials are not persisted by default. Sensitive persistence requires an explicit secure-storage strategy. Android/iOS remain authoritative for process lifetime, background execution, permissions and resource limits.
