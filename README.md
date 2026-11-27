@@ -25,6 +25,7 @@ This repository is a Dart/Flutter monorepo. Packages are intentionally separated
 - `packages/continuum_persistence` — storage abstractions and persistence policies.
 - `packages/continuum_recovery` — recovery orchestration and checkpoints.
 - `packages/continuum_drafts` — optional form-draft persistence, privacy filtering, autosave and schema migrations.
+- `packages/continuum_navigation_recovery` — router-agnostic navigation stack recovery with route allow-lists and migrations.
 
 Additional modules (navigation, operations, background tasks, offline sync, keyboard and feedback) will be added behind stable contracts.
 
