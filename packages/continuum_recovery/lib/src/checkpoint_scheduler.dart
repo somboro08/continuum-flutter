@@ -76,7 +76,18 @@ class CheckpointScheduler {
       }
       _waiters.clear();
     }
-    await _running;
+    await _waitUntilIdle();
+  }
+
+  Future<void> _waitUntilIdle() async {
+    while (_running != null || _waiters.isNotEmpty) {
+      final active = _running;
+      if (active != null) {
+        await active;
+      } else {
+        _tryRun(ignoreThrottle: true);
+      }
+    }
   }
 
   void _ensureActive() {
