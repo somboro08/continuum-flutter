@@ -5,6 +5,7 @@ enum DraftErrorCode {
   formMismatch,
   unsupportedVersion,
   missingMigration,
+  migrationFailed,
 }
 
 /// Typed failure raised by the draft persistence layer.
