@@ -5,7 +5,7 @@ import 'draft_privacy_policy.dart';
 import 'draft_repository.dart';
 import 'draft_migration.dart';
 import 'draft_snapshot.dart';
-import 'draft_autosave_controller.dart';
+import 'draft_autosave_port.dart';
 
 /// UI-framework-neutral state holder for one form's draft.
 class DraftSession {
@@ -42,7 +42,7 @@ class DraftSession {
   final bool clearOnSuccessfulSubmission;
 
   final Map<String, Object?> _values = <String, Object?>{};
-  DraftAutosaveController? _controller;
+  DraftAutosavePort? _controller;
   int _revision = 0;
   bool _dirty = false;
 
@@ -77,6 +77,7 @@ class DraftSession {
     if (!fields.containsKey(fieldId)) {
       throw ArgumentError.value(fieldId, 'fieldId', 'Field is not registered.');
     }
+    if (controller.isDisposed) throw StateError('Draft autosave controller has been disposed.');
     _values[fieldId] = value;
     _revision++;
     _dirty = true;
@@ -86,6 +87,7 @@ class DraftSession {
   /// Applies a group of field changes and schedules one coalesced checkpoint.
   Future<CheckpointResult> updateFields(Map<String, Object?> changes) {
     final controller = _requireController();
+    if (controller.isDisposed) throw StateError('Draft autosave controller has been disposed.');
     for (final fieldId in changes.keys) {
       if (!fields.containsKey(fieldId)) {
         throw ArgumentError.value(fieldId, 'changes', 'Unknown field "$fieldId".');
@@ -110,6 +112,7 @@ class DraftSession {
         formId: formId,
         clearDraft: true,
       );
+      _dirty = false;
     }
     if (clearValues) {
       _values.clear();
@@ -122,14 +125,14 @@ class DraftSession {
   ///
   /// Public for package composition; application code should normally call
   /// [DraftAutosaveController.register].
-  void attachController(DraftAutosaveController controller) {
+  void attachController(DraftAutosavePort controller) {
     if (_controller != null && !identical(_controller, controller)) {
       throw StateError('Draft session is already attached to another controller.');
     }
     _controller = controller;
   }
 
-  void detachController(DraftAutosaveController controller) {
+  void detachController(DraftAutosavePort controller) {
     if (identical(_controller, controller)) _controller = null;
   }
 
