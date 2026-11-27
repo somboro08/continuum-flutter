@@ -116,6 +116,27 @@ void main() {
     await source.close();
   });
 
+  test('reports synchronous scheduling errors when scheduler is already disposed', () async {
+    final source = FakeLifecycleSource();
+    final scheduler = CheckpointScheduler(checkpoint: () async => success());
+    await scheduler.dispose();
+    final reported = <Object>[];
+    final binding = LifecycleCheckpointBinding(
+      lifecycle: source,
+      scheduler: scheduler,
+      checkpointOn: const {AppLifecyclePhase.paused},
+      immediateOn: const {AppLifecyclePhase.paused},
+      onCheckpointError: (error, _, __) => reported.add(error),
+    )..start();
+
+    source.emit(AppLifecyclePhase.paused);
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    expect(reported.single, isA<StateError>());
+
+    await binding.dispose();
+    await source.close();
+  });
+
   test('start is idempotent and disposed bindings reject restart', () async {
     final source = FakeLifecycleSource();
     var calls = 0;
