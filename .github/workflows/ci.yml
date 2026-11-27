@@ -46,3 +46,6 @@ jobs:
       - name: Analyze
         working-directory: packages/continuum_lifecycle
         run: flutter analyze
+      - name: Test
+        working-directory: packages/continuum_lifecycle
+        run: flutter test
