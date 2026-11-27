@@ -19,6 +19,10 @@ These are intentionally separate dependency lines. The application composes them
 ## Runtime
 Modules declare stable IDs and dependencies. Continuum validates the dependency graph, initializes modules in dependency order, and disposes initialized modules in reverse order. A failed initialization triggers best-effort rollback, including cleanup of the module whose initialization failed.
 
+## Storage adapters
+
+`continuum_persistence` defines the storage port. `continuum_storage_file` is an optional Dart I/O adapter; applications choose its directory and must not use it for secrets because it does not encrypt values. Tests and ephemeral features can use `InMemoryContinuumStore`. `NamespacedContinuumStore` isolates a feature's keyspace without tying it to a storage engine.
+
 ## Recovery
 Each feature implements `RecoveryParticipant` and serializes its own snapshot. `RecoveryCoordinator` stores opaque strings through `ContinuumStore`; it does not know about forms, navigation or app state.
 
