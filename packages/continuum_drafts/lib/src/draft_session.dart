@@ -108,6 +108,10 @@ class DraftSession {
   }) async {
     final shouldClearDraft = clearDraft ?? clearOnSuccessfulSubmission;
     if (shouldClearDraft) {
+      final controller = _controller;
+      if (controller != null && !controller.isDisposed) {
+        await controller.checkpointNow();
+      }
       await repository.afterSuccessfulSubmission(
         formId: formId,
         clearDraft: true,
@@ -124,7 +128,7 @@ class DraftSession {
   /// Attaches this session to one autosave controller.
   ///
   /// Public for package composition; application code should normally call
-  /// [DraftAutosaveController.register].
+  /// DraftAutosaveController.register.
   void attachController(DraftAutosavePort controller) {
     if (_controller != null && !identical(_controller, controller)) {
       throw StateError('Draft session is already attached to another controller.');
