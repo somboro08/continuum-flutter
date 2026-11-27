@@ -13,6 +13,7 @@ continuum_core  ←  continuum_lifecycle
 
 continuum_persistence  ←  continuum_recovery
 continuum_persistence + continuum_recovery  ←  continuum_drafts
+continuum_recovery  ←  continuum_navigation_recovery
 
 continuum_persistence  ←  continuum_storage_file
 
@@ -38,4 +39,6 @@ Checkpoints are best-effort. Save at meaningful state changes and lifecycle tran
 Passwords, OTPs, secrets and payment credentials are not persisted by default. Sensitive persistence requires an explicit secure-storage strategy. Android/iOS remain authoritative for process lifetime, background execution, permissions and resource limits.
 
 ## Extension points
-Draft/form recovery is provided by the optional `continuum_drafts` package. It uses the storage port and shared checkpoint scheduler, keeps schema and migration ownership with each form, and filters fields through an explicit privacy policy. Navigation, search history, operation journal, background scheduling, offline synchronization, keyboard/focus and feedback helpers should likewise be independently installable packages or adapters. They must not add mandatory dependencies to core.
+Draft/form recovery is provided by the optional `continuum_drafts` package. It uses the storage port and shared checkpoint scheduler, keeps schema and migration ownership with each form, and filters fields through an explicit privacy policy. Search history, operation journal, background scheduling, offline synchronization, keyboard/focus and feedback helpers should likewise be independently installable packages or adapters.
+
+Navigation recovery is provided by the optional `continuum_navigation_recovery` package. It implements `RecoveryParticipant`, stores router-neutral route IDs and explicitly allow-listed parameters, validates the complete stack before restore, and delegates router operations to an application-owned `NavigationStatePort`. It does not depend on or select a routing library. They must not add mandatory dependencies to core.
