@@ -5,11 +5,13 @@ import 'draft_field.dart';
 /// By default only ordinary fields are eligible. Secret, one-time-code and
 /// payment fields are always excluded, even if accidentally allow-listed.
 class DraftPrivacyPolicy {
-  const DraftPrivacyPolicy({
-    this.allowedSensitivities = const <DraftFieldSensitivity>{
+  DraftPrivacyPolicy({
+    Set<DraftFieldSensitivity> allowedSensitivities = const <DraftFieldSensitivity>{
       DraftFieldSensitivity.ordinary,
     },
-  });
+  }) : allowedSensitivities = Set<DraftFieldSensitivity>.unmodifiable(
+          allowedSensitivities,
+        );
 
   final Set<DraftFieldSensitivity> allowedSensitivities;
 
