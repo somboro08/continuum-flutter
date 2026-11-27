@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:continuum_navigation_recovery/continuum_navigation_recovery.dart';
@@ -8,13 +7,8 @@ import 'navigation_page_registry.dart';
 /// Bridges Continuum's router-neutral navigation port to Flutter's
 /// declarative [Navigator.pages] API.
 ///
-/// The adapter owns only a serializable list of [NavigationEntry] values and
-/// the corresponding immutable [Page] list. It does not own a Navigator,
-/// GlobalKey, BuildContext, route controller, or application widget tree.
-///
-/// Supply [pages] to [Navigator.pages] and [handlePageRemoved] to
-/// [Navigator.onDidRemovePage]. The host application remains responsible for
-/// creating and owning its Navigator widget.
+/// The adapter owns only serializable navigation entries and their immutable
+/// Flutter page projection. The host application owns the Navigator widget.
 class NavigatorPagesAdapter extends ChangeNotifier
     implements NavigationStatePort {
   NavigatorPagesAdapter({
@@ -42,18 +36,17 @@ class NavigatorPagesAdapter extends ChangeNotifier
     return List<NavigationEntry>.unmodifiable(_entries);
   }
 
-  /// Builds and validates the entire target page list before publishing it.
+  /// Builds and validates the complete target page list before publishing it.
   ///
-  /// If a route factory throws, a route is missing, or page keys collide, the
-  /// existing stack and visible page list remain unchanged.
+  /// A missing factory, factory error, null key or duplicate key leaves the
+  /// existing stack untouched.
   @override
   Future<void> replaceStack(List<NavigationEntry> entries) async {
     _ensureNotDisposed();
     final nextEntries = List<NavigationEntry>.unmodifiable(entries);
     final nextPages = _buildPages(nextEntries);
 
-    // These assignments are synchronous and happen only after every factory
-    // has succeeded, so observers never see a partially replaced stack.
+    // Publish only after every factory and key has been validated.
     _entries = nextEntries;
     _pages = nextPages;
     notifyListeners();
@@ -70,8 +63,8 @@ class NavigatorPagesAdapter extends ChangeNotifier
 
   /// Reconciles a user-driven Navigator pop with the adapter's source of truth.
   ///
-  /// Pass this method directly as Navigator.onDidRemovePage. It returns false
-  /// when [page] is not one of the currently published pages.
+  /// Pass this method to Navigator.onDidRemovePage. It returns false when
+  /// [page] is not one of the currently published pages.
   bool handlePageRemoved(Page<Object?> page) {
     if (_disposed) return false;
     final index = _pages.indexWhere((candidate) => identical(candidate, page));
@@ -98,10 +91,18 @@ class NavigatorPagesAdapter extends ChangeNotifier
       }
 
       final page = factory(entry);
-      if (!keys.add(page.key)) {
+      final pageKey = page.key;
+      if (pageKey == null) {
+        throw StateError(
+          'Flutter page factory for route "${entry.routeId}" returned a '
+          'page without a key. Every page in a recoverable stack must have '
+          'a stable, unique key.',
+        );
+      }
+      if (!keys.add(pageKey)) {
         throw StateError(
           'Flutter page factory for route "${entry.routeId}" produced a '
-          'duplicate page key "${page.key}". Each stack occurrence needs '
+          'duplicate page key "$pageKey". Each stack occurrence needs '
           'a unique key.',
         );
       }
