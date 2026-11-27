@@ -14,6 +14,8 @@ continuum_core  ←  continuum_lifecycle
 continuum_persistence  ←  continuum_recovery
 
 continuum_persistence  ←  continuum_storage_file
+
+continuum_core + continuum_recovery  ←  continuum_recovery_lifecycle
 ```
 
 These are intentionally separate dependency lines. The application composes them; no package needs to pull the entire framework into its dependency graph.
@@ -29,7 +31,7 @@ Each feature implements `RecoveryParticipant` and serializes its own snapshot. `
 
 `CheckpointScheduler` coalesces nearby checkpoint requests with a debounce window and enforces a minimum interval between automatic runs. Explicit checkpoints bypass both limits. Requests arriving during an active checkpoint are queued for a later snapshot; they are never incorrectly completed by an older snapshot. Disposal can flush pending work and waits for all queued checkpoints.
 
-Checkpoints are best-effort. Save at meaningful state changes and lifecycle transitions; never depend on a final callback before process death. A null snapshot deletes an older checkpoint so stale data cannot be restored accidentally. The scheduler does not subscribe to Flutter lifecycle events; a lifecycle adapter or application module decides when to request checkpoints.
+Checkpoints are best-effort. Save at meaningful state changes and lifecycle transitions; never depend on a final callback before process death. A null snapshot deletes an older checkpoint so stale data cannot be restored accidentally. The scheduler does not subscribe to lifecycle events itself. The optional `continuum_recovery_lifecycle` package bridges the platform-neutral `LifecycleEventSource` to the scheduler. By default, hidden/paused/detached request checkpoints and paused/detached bypass debounce and throttling. The binding does not own the source or scheduler; applications control disposal order.
 
 ## Privacy and platform rules
 Passwords, OTPs, secrets and payment credentials are not persisted by default. Sensitive persistence requires an explicit secure-storage strategy. Android/iOS remain authoritative for process lifetime, background execution, permissions and resource limits.
