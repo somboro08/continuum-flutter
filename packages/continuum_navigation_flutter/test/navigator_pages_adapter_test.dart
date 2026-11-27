@@ -1,6 +1,6 @@
 import 'package:continuum_navigation_flutter/continuum_navigation_flutter.dart';
 import 'package:continuum_navigation_recovery/continuum_navigation_recovery.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
