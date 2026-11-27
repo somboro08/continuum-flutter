@@ -62,11 +62,20 @@ void main() {
         formId: 'profile',
         schema: DraftSchema(version: 1),
         fields: fields,
-        values: const {'name': 'Ada', 'email': 'ada@example.com'},
+        values: const {
+          'name': 'Ada',
+          'email': 'ada@example.com',
+          'password': 'never-store',
+          'otp': '123456',
+          'card': '4111111111111111',
+        },
         policy: DraftPrivacyPolicy(
           allowedSensitivities: {
             DraftFieldSensitivity.ordinary,
             DraftFieldSensitivity.personal,
+            DraftFieldSensitivity.secret,
+            DraftFieldSensitivity.oneTimeCode,
+            DraftFieldSensitivity.payment,
           },
         ),
       );
