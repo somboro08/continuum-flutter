@@ -108,8 +108,9 @@ void main() {
       checkpoint: () async => success(),
     );
     final pending = scheduler.requestCheckpoint();
+    final expectation = expectLater(pending, throwsStateError);
     await scheduler.dispose();
-    await expectLater(pending, throwsStateError);
+    await expectation;
   });
 
   test('waits for an active checkpoint during disposal', () async {
