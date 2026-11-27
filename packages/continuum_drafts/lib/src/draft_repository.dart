@@ -42,7 +42,7 @@ class DraftRepository {
     required DraftSchema schema,
     required Map<String, DraftFieldDefinition> fields,
     required Map<String, Object?> values,
-    DraftPrivacyPolicy policy = const DraftPrivacyPolicy(),
+    DraftPrivacyPolicy? policy,
     Duration? ttl,
   }) async {
     _validateFormId(formId);
@@ -50,6 +50,7 @@ class DraftRepository {
       throw ArgumentError.value(ttl, 'ttl', 'Must be greater than zero.');
     }
 
+    final effectivePolicy = policy ?? DraftPrivacyPolicy();
     final persistable = <String, Object?>{};
     for (final entry in values.entries) {
       final definition = fields[entry.key];
@@ -59,7 +60,7 @@ class DraftRepository {
           'Field map key "${entry.key}" does not match definition id "${definition.id}".',
         );
       }
-      if (policy.allows(definition)) {
+      if (effectivePolicy.allows(definition)) {
         persistable[entry.key] = entry.value;
       }
     }
