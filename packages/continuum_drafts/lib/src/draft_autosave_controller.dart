@@ -25,7 +25,7 @@ class DraftAutosaveController {
     if (_sessions.containsKey(session.formId)) {
       throw StateError('A draft session for "${session.formId}" is already registered.');
     }
-    session._attach(this);
+    session.attachController(this);
     _sessions[session.formId] = session;
   }
 
@@ -33,7 +33,7 @@ class DraftAutosaveController {
     _ensureActive();
     final session = _sessions.remove(formId);
     if (session == null) return false;
-    session._detach(this);
+    session.detachController(this);
     return true;
   }
 
@@ -52,7 +52,7 @@ class DraftAutosaveController {
     _disposed = true;
     await _scheduler.dispose(flushPending: flushPending);
     for (final session in _sessions.values) {
-      session._detach(this);
+      session.detachController(this);
     }
     _sessions.clear();
   }
@@ -64,7 +64,7 @@ class DraftAutosaveController {
 
     for (final session in _sessions.values.toList()) {
       try {
-        final result = await session._persistIfDirty();
+        final result = await session.persistIfDirty();
         if (result == null) continue;
         if (result.cleared) {
           cleared.add(session.formId);
