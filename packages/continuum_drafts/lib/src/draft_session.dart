@@ -14,10 +14,11 @@ class DraftSession {
     required this.formId,
     required this.schema,
     required Map<String, DraftFieldDefinition> fields,
-    this.privacyPolicy = const DraftPrivacyPolicy(),
+    DraftPrivacyPolicy? privacyPolicy,
     this.ttl,
     this.clearOnSuccessfulSubmission = true,
-  }) : fields = Map<String, DraftFieldDefinition>.unmodifiable(fields) {
+  })  : fields = Map<String, DraftFieldDefinition>.unmodifiable(fields),
+        privacyPolicy = privacyPolicy ?? DraftPrivacyPolicy() {
     if (formId.trim().isEmpty) {
       throw ArgumentError.value(formId, 'formId', 'Must not be empty.');
     }
