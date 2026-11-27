@@ -15,7 +15,7 @@
 ## Next
 - [x] Lifecycle checkpoint policy and lifecycle adapter integration
 - [ ] Encrypted storage adapter (opt-in, separate package)
-- [ ] Draft/form recovery participant
+- [x] Draft/form recovery package with privacy filtering, autosave and schema migrations
 - [ ] Navigation restoration adapter
 - [ ] Operation journal and idempotent resume safeguards
 
