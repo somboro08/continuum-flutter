@@ -16,6 +16,7 @@ jobs:
           - packages/continuum_core
           - packages/continuum_persistence
           - packages/continuum_recovery
+          - packages/continuum_storage_file
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
