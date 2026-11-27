@@ -1,9 +1,10 @@
 import 'package:continuum_recovery/continuum_recovery.dart';
 
 import 'draft_session.dart';
+import 'draft_autosave_port.dart';
 
 /// Batches dirty draft sessions through Continuum's shared checkpoint scheduler.
-class DraftAutosaveController {
+class DraftAutosaveController implements DraftAutosavePort {
   DraftAutosaveController({
     Duration debounce = const Duration(milliseconds: 400),
     Duration minimumInterval = const Duration(seconds: 2),
