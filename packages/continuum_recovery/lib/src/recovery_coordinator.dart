@@ -49,14 +49,19 @@ class RecoveryCoordinator {
     _participants[id] = participant;
   }
 
-  bool unregister(String recoveryId) => _participants.remove(recoveryId) != null;
+  bool unregister(String recoveryId) {
+    final id = recoveryId.trim();
+    validateStorageKey(id, parameterName: 'recoveryId');
+    return _participants.remove(id) != null;
+  }
 
   Future<CheckpointResult> checkpoint() => _exclusive(() async {
     final saved = <String>[];
     final cleared = <String>[];
     final failed = <String, RecoveryFailure>{};
-    for (final participant in _participants.values.toList()) {
-      final id = participant.recoveryId;
+    for (final entry in _participants.entries.toList()) {
+      final id = entry.key;
+      final participant = entry.value;
       String? snapshot;
       try {
         snapshot = await participant.createSnapshot();
@@ -83,8 +88,9 @@ class RecoveryCoordinator {
     final restored = <String>[];
     final missing = <String>[];
     final failed = <String, RecoveryFailure>{};
-    for (final participant in _participants.values.toList()) {
-      final id = participant.recoveryId;
+    for (final entry in _participants.entries.toList()) {
+      final id = entry.key;
+      final participant = entry.value;
       String? snapshot;
       try {
         snapshot = await _store.read(_key(id));
@@ -107,10 +113,11 @@ class RecoveryCoordinator {
   });
 
   Future<void> clear(String recoveryId) => _exclusive(() async {
-    validateStorageKey(recoveryId, parameterName: 'recoveryId');
-    final participant = _participants[recoveryId];
+    final id = recoveryId.trim();
+    validateStorageKey(id, parameterName: 'recoveryId');
+    final participant = _participants[id];
     if (participant != null) await participant.clearRecoveredState();
-    await _store.delete(_key(recoveryId));
+    await _store.delete(_key(id));
   });
 
   String _key(String id) => '$namespace.$id';
