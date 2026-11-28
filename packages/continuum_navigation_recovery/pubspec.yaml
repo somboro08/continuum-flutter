@@ -1,0 +1,11 @@
+name: continuum_navigation_recovery
+description: Router-agnostic navigation state recovery for Continuum.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+dependencies:
+  continuum_recovery:
+    path: ../continuum_recovery
+dev_dependencies:
+  test: ^1.25.0

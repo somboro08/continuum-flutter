@@ -1,0 +1,16 @@
+name: continuum_navigation_go_router
+description: Optional GoRouter bridge for Continuum navigation recovery.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  go_router: ^16.2.5
+  continuum_navigation_recovery:
+    path: ../continuum_navigation_recovery
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

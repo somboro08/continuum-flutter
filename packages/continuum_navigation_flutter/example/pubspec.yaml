@@ -1,0 +1,30 @@
+name: continuum_navigation_flutter_example
+description: Runnable Flutter example for Continuum navigation recovery.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.32.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.5
+  continuum_navigation_flutter:
+    path: ..
+  continuum_navigation_recovery:
+    path: ../../continuum_navigation_recovery
+  continuum_recovery:
+    path: ../../continuum_recovery
+  continuum_persistence:
+    path: ../../continuum_persistence
+  continuum_storage_file:
+    path: ../../continuum_storage_file
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: false

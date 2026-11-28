@@ -1,0 +1,9 @@
+library continuum_core;
+export 'src/continuum.dart';
+export 'src/continuum_context.dart';
+export 'src/continuum_module.dart';
+export 'src/continuum_service_registry.dart';
+export 'src/lifecycle/app_lifecycle_phase.dart';
+export 'src/lifecycle/lifecycle_transition.dart';
+export 'src/lifecycle/lifecycle_event_source.dart';
+export 'src/persistence/persistence_policy.dart';

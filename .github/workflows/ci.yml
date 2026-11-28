@@ -1,0 +1,65 @@
+name: Dart and Flutter CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: continuum-ci-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - packages/continuum_core
+          - packages/continuum_drafts
+          - packages/continuum_navigation_recovery
+          - packages/continuum_persistence
+          - packages/continuum_recovery
+          - packages/continuum_recovery_lifecycle
+          - packages/continuum_storage_file
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Resolve dependencies
+        working-directory: ${{ matrix.package }}
+        run: dart pub get
+      - name: Analyze
+        working-directory: ${{ matrix.package }}
+        run: dart analyze
+      - name: Test
+        working-directory: ${{ matrix.package }}
+        run: dart test
+
+  flutter-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - packages/continuum_lifecycle
+          - packages/continuum_navigation_flutter
+          - packages/continuum_navigation_go_router
+          - packages/continuum_navigation_flutter/example
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Resolve dependencies
+        working-directory: ${{ matrix.package }}
+        run: flutter pub get
+      - name: Analyze
+        working-directory: ${{ matrix.package }}
+        run: flutter analyze
+      - name: Test
+        working-directory: ${{ matrix.package }}
+        run: flutter test
