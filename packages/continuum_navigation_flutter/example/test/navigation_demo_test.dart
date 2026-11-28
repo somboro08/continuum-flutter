@@ -1,5 +1,6 @@
 import 'package:continuum_navigation_flutter_example/main.dart';
 import 'package:continuum_persistence/continuum_persistence.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
