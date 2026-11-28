@@ -15,6 +15,7 @@ continuum_persistence  ←  continuum_recovery
 continuum_persistence + continuum_recovery  ←  continuum_drafts
 continuum_recovery  ←  continuum_navigation_recovery
 continuum_navigation_recovery + Flutter SDK  ←  continuum_navigation_flutter
+continuum_navigation_recovery + Flutter + go_router  ←  continuum_navigation_go_router
 
 continuum_persistence  ←  continuum_storage_file
 
@@ -44,6 +45,6 @@ Draft/form recovery is provided by the optional `continuum_drafts` package. It u
 
 Navigation recovery is provided by the optional `continuum_navigation_recovery` package. It implements `RecoveryParticipant`, stores router-neutral route IDs and explicitly allow-listed parameters, validates the complete stack before restore, and delegates router operations to an application-owned `NavigationStatePort`.
 
-The optional `continuum_navigation_flutter` package implements that port using Flutter's declarative `Navigator.pages` API (Flutter 3.32 or newer). Its `NavigationPageRegistry` maps route IDs to application-owned page factories. It validates the complete target page list before publishing a replacement, while the host application retains ownership of the Navigator widget. The recovery package remains independent of Flutter and other routing libraries. GoRouter and AutoRoute adapters can be implemented separately against the same port.
+The optional `continuum_navigation_flutter` package implements that port using Flutter's declarative `Navigator.pages` API (Flutter 3.32 or newer). Its `NavigationPageRegistry` maps route IDs to application-owned page factories. It validates the complete target page list before publishing a replacement, while the host application retains ownership of the Navigator widget. The recovery package remains independent of Flutter and other routing libraries. The optional `continuum_navigation_go_router` package bridges the same port to GoRouter without exposing GoRouter internals to recovery. Because nested routes, shell branches, redirects and imperative pushes do not map uniformly to a linear stack, the host application supplies complete-stack reader/writer callbacks. The writer owns validation, route resolution and any rollback policy; the adapter does not claim atomic replacement across GoRouter redirects or guards. Other routers can implement the same port independently.
 
 A runnable Android/iOS composition lives in `packages/continuum_navigation_flutter/example`. It combines the Flutter adapter with the navigation recovery participant, coordinator and the optional file store. Its tests use the in-memory store to simulate a new application environment without claiming that the operating system preserves a process.
