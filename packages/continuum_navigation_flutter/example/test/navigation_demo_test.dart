@@ -34,6 +34,7 @@ void main() {
       ['home', 'details'],
     );
 
+    await tester.pumpWidget(const SizedBox());
     firstEnvironment.dispose();
     restoredEnvironment.dispose();
   });
